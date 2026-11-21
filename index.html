@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>سامانه یکپارچه انتخابات مدارس</title>
+<meta name="description" content="سامانه رأی‌گیری آنلاین مدارس با ادمین ارشد، مدیر کل، مدیر مدرسه و درگاه رأی‌دهندگان (Supabase)">
+<meta name="theme-color" content="#5145cd">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#17213b;--mut:#71809c;--pri:#5145cd;--pri2:#eeedff;--line:#e5e9f2;--green:#0e9f79;--red:#e34d67;--gold:#e8a12a;--shadow:0 12px 34px #27345b12}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.8}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}button:disabled{opacity:.55;cursor:not-allowed}
+.top{background:linear-gradient(120deg,#21185d,#5145cd 58%,#0b9e91);color:#fff;padding:24px max(18px,calc((100% - 1220px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:50px;height:50px;border-radius:16px;background:#ffffff20;display:grid;place-items:center;font-size:27px}
+.top h1{font-size:1.2rem;margin:0}.top p{margin:2px 0 0;opacity:.8;font-size:.83rem}
+.shell{max-width:1220px;margin:24px auto;padding:0 16px 50px}.layout{display:grid;grid-template-columns:245px 1fr;gap:18px}
+.side,.panel,.stat,.login{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.side{padding:14px;height:max-content;position:sticky;top:14px}
+.nav{width:100%;display:flex;align-items:center;gap:10px;text-align:right;padding:11px 12px;border-radius:12px;background:transparent;color:var(--mut);margin:3px 0}
+.nav.active,.nav:hover{background:var(--pri2);color:var(--pri);font-weight:700}
+.nav span:first-child{font-size:18px;width:24px}.main{min-width:0}
+.pagehead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.pagehead h2{margin:0;font-size:1.35rem}.muted{color:var(--mut);font-size:.88rem}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.stat{padding:16px}.stat .ico{width:38px;height:38px;border-radius:12px;background:var(--pri2);display:grid;place-items:center;font-size:19px}
+.stat small{color:var(--mut)}.stat strong{display:block;font-size:1.65rem;line-height:1.5}
+.panel{padding:18px;margin-bottom:15px}.panel h3{margin:0 0 12px;font-size:1.02rem}
+.btn{background:var(--pri);color:white;border-radius:11px;padding:10px 15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{filter:brightness(1.08)}.btn.light{background:var(--pri2);color:var(--pri)}
+.btn.red{background:#fff0f2;color:var(--red)}.btn.green{background:#e5f8f2;color:var(--green)}
+.btn.small{padding:6px 10px;font-size:.82rem}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:.85rem;color:var(--mut)}
+input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:#fbfcff;color:var(--tx);outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px #5145cd18}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.formgrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.tablewrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:570px}
+th,td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:right;font-size:.9rem}
+th{color:var(--mut);font-weight:600;background:#fafbfe}tr:last-child td{border-bottom:0}
+.tag{display:inline-block;border-radius:30px;padding:2px 10px;background:#e8f7f1;color:var(--green);font-size:.78rem}
+.tag.off{background:#fff0f2;color:var(--red)}
+.bar{height:9px;background:#eeeff6;border-radius:20px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#5145cd,#0eaa91);border-radius:20px}
+.login{max-width:470px;margin:55px auto;padding:26px}.login h2{margin:0 0 5px}
+.hidden{display:none!important}
+.sw{position:relative;width:48px;height:26px;border-radius:20px;background:#d5d9e6;padding:0;flex:0 0 auto;transition:background .2s}
+.sw::after{content:'';position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #0003;transition:right .2s}
+.sw.on{background:var(--green)}.sw.on::after{right:25px}
+.swrow{display:flex;align-items:center;gap:8px}.swrow small{color:var(--mut);min-width:46px}
+.alert{padding:11px 13px;border-radius:11px;background:#fff4df;color:#855c13;margin:10px 0;font-size:.88rem}
+.alert.error{background:#fff0f2;color:#a82f48}
+.alert.ok{background:#e5f8f2;color:#087a5d}
+.chartbox{height:300px;position:relative}
+.ranknum{width:28px;height:28px;border-radius:9px;display:inline-grid;place-items:center;background:var(--pri2);color:var(--pri);font-weight:800}
+.voter{max-width:720px;margin:28px auto;padding:0 14px}
+.candidate{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;margin:8px 0;cursor:pointer;transition:.15s}
+.candidate.selected{border-color:var(--green);background:#effbf7}
+.candidate input{width:auto}
+.foot{text-align:center;color:var(--mut);font-size:.8rem;margin:25px 0}
+.codebox{display:block;direction:ltr;text-align:left;overflow-wrap:anywhere;background:#f5f6fb;padding:12px;border-radius:10px;font-family:monospace;font-size:.85rem}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-backdrop{position:fixed;inset:0;background:rgba(23,33,59,.42);display:grid;place-items:center;z-index:1000;backdrop-filter:blur(4px);animation:fadeIn .15s}
+.modal{background:#fff;border-radius:18px;padding:22px;max-width:420px;width:calc(100% - 32px);box-shadow:0 30px 60px rgba(23,33,59,.25);animation:popIn .2s}
+@keyframes fadeIn{from{opacity:0}}@keyframes popIn{from{transform:scale(.94);opacity:0}}
+.toast{position:fixed;bottom:24px;right:24px;background:#17213b;color:#fff;padding:12px 18px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.22);z-index:1100;animation:slideIn .25s;max-width:calc(100% - 48px)}
+.toast.error{background:var(--red)}.toast.ok{background:var(--green)}
+@keyframes slideIn{from{transform:translateY(20px);opacity:0}}
+.searchbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.searchbar input{max-width:320px}
+.pagination{display:flex;gap:6px;justify-content:center;margin-top:14px}
+.pagination button{min-width:36px;padding:6px 10px;border-radius:9px;background:var(--pri2);color:var(--pri);font-weight:700}
+.pagination button.active{background:var(--pri);color:#fff}
+.pagination button:disabled{opacity:.4}
+.tracking{background:linear-gradient(135deg,#0e9f79,#0e8fbb);color:#fff;padding:18px;border-radius:14px;text-align:center;margin:14px 0}
+.tracking .code{font-family:monospace;font-size:1.2rem;letter-spacing:2px;background:#ffffff20;padding:8px 14px;border-radius:10px;display:inline-block;margin-top:6px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.side{position:static;display:flex;overflow:auto;gap:5px;padding:8px}.nav{white-space:nowrap;width:auto;flex:0 0 auto}.nav span:last-child{display:none}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.top{padding:18px}.shell{margin-top:14px}.grid{gap:8px}.stat{padding:12px}.stat strong{font-size:1.35rem}.formgrid,.formgrid.three{grid-template-columns:1fr}.panel{padding:14px}.login{margin:28px 12px}.toast{right:12px;left:12px;bottom:12px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="logo"><img src="assets/icon.svg" alt="" width="50" height="50" style="border-radius:16px;display:block"></div>
+    <div>
+      <h1>سامانه یکپارچه انتخابات مدارس</h1>
+      <p>مدیریت متمرکز، رأی‌گیری مستقل و گزارش‌گیری تجمیعی</p>
+    </div>
+  </div>
+  <div id="topInfo">پنل مدیریت مرکزی</div>
+</header>
+<div id="app"></div>
+
+<script src="config.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   پیش‌نیاز سمت سرور (Supabase):
+   1) mc_cast_vote باید پارامتر national_id را بپذیرد و با
+      UNIQUE(school_id, national_id) از رأی تکراری جلوگیری کند.
+   2) پاسخ mc_cast_vote شامل tracking_code باشد.
+   3) تمام توابع mc_* با SECURITY DEFINER و RLS فعال.
+   4) پاسخ‌ها با کلیدهای یکدست: schools / candidates / rows / vote_count.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const { SUPABASE_URL, SUPABASE_KEY } = window.APP_CONFIG || {};
+if (!SUPABASE_URL || !SUPABASE_KEY) document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('app').innerHTML = '<div class="login"><div class="alert error">فایل config.js پیدا نشد یا خالی است. آن را از config.example.js بسازید.</div></div>';
+});
+const SESSION_KEY = 'mc_session_v2';
+const SCHOOLS_PAGE_SIZE = 12;
+
+/* ── Utilities ─────────────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+const fa = n => Number(n || 0).toLocaleString('fa-IR');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* دسترسی یکدست به فیلدهای پاسخ سرور */
+const F = {
+  votes:  r => Number(r?.vote_count ?? r?.votes ?? r?.c ?? 0),
+  name:   r => String(r?.candidate_name ?? r?.name ?? ''),
+  school: r => String(r?.school_name ?? ''),
+  rank:   (r, i) => Number(r?.rank ?? (i + 1)),
+  candList: d => Array.isArray(d?.candidates) ? d.candidates : [],
+};
+
+async function rpc(fn, args = {}) {
+  let r;
+  try {
+    r = await fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args)
+    });
+  } catch (e) { throw Error('ارتباط با سرور برقرار نشد.'); }
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  if (!r.ok) throw Error(j.message || j.details || 'تابع سمت سرور پاسخ درستی نداد.');
+  return j;
+}
+
+/* ── State ─────────────────────────────────────────────────────── */
+const state = {
+  role: '',
+  session: '',
+  schools: [],
+  dashboard: null,
+  schoolData: null,
+  selectedSchool: null,
+  activeTab: 'overview',
+  managerSchoolId: null,     // حالت drill-down مدیر کل
+  schoolsPage: 0,
+  schoolsQuery: '',
+  lastRanks: [],
+};
+
+/* ── Session persistence ───────────────────────────────────────── */
+function saveSession(role, token) {
+  try { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ role, token })); } catch (e) {}
+}
+function readSession() {
+  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { return null; }
+}
+function clearSession() {
+  try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+}
+
+/* ── Toast & confirm modal ─────────────────────────────────────── */
+function toast(msg, type = 'ok') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type === 'error' ? 'error' : 'ok');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3600);
+}
+function confirmModal(msg, okLabel = 'تأیید', danger = false) {
+  return new Promise(resolve => {
+    const back = document.createElement('div');
+    back.className = 'modal-backdrop';
+    back.innerHTML = `<div class="modal">
+      <p style="margin-top:0;font-weight:600">${esc(msg)}</p>
+      <div class="actions" style="justify-content:flex-end">
+        <button class="btn light" id="cmCancel">انصراف</button>
+        <button class="btn ${danger ? 'red' : ''}" id="cmOk">${esc(okLabel)}</button>
+      </div>
+    </div>`;
+    document.body.appendChild(back);
+    const close = v => { back.remove(); resolve(v); };
+    back.querySelector('#cmCancel').onclick = () => close(false);
+    back.querySelector('#cmOk').onclick = () => close(true);
+    back.addEventListener('click', e => { if (e.target === back) close(false); });
+  });
+}
+
+function passwordModal(msg, okLabel = 'ذخیره') {
+  return new Promise(resolve => {
+    const back = document.createElement('div');
+    back.className = 'modal-backdrop';
+    back.innerHTML = `<div class="modal">
+      <p style="margin-top:0;font-weight:600">${esc(msg)}</p>
+      <div class="field"><input id="pmInput" type="text" dir="ltr" autocomplete="off" placeholder="حداقل ۱۲ نویسه"></div>
+      <div id="pmErr"></div>
+      <div class="actions" style="justify-content:flex-end">
+        <button class="btn light" id="pmCancel">انصراف</button>
+        <button class="btn" id="pmOk">${esc(okLabel)}</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = v => { back.remove(); resolve(v); };
+    back.querySelector('#pmCancel').onclick = () => close(null);
+    back.querySelector('#pmOk').onclick = () => {
+      const v = back.querySelector('#pmInput').value;
+      if (v.length < 12) { back.querySelector('#pmErr').innerHTML = alertBox('رمز عبور حداقل ۱۲ نویسه باشد.', 'error'); return; }
+      close(v);
+    };
+    back.querySelector('#pmInput').focus();
+  });
+}
+
+function usernameModal(msg, current = '', okLabel = 'ذخیره') {
+  return new Promise(resolve => {
+    const back = document.createElement('div');
+    back.className = 'modal-backdrop';
+    back.innerHTML = `<div class="modal">
+      <p style="margin-top:0;font-weight:600">${esc(msg)}</p>
+      <div class="field"><input id="unInput" type="text" dir="ltr" autocomplete="off" maxlength="40" placeholder="حداقل ۴ نویسه انگلیسی" value="${esc(current)}"></div>
+      <div id="unErr"></div>
+      <div class="actions" style="justify-content:flex-end">
+        <button class="btn light" id="unCancel">انصراف</button>
+        <button class="btn" id="unOk">${esc(okLabel)}</button>
+      </div></div>`;
+    document.body.appendChild(back);
+    const close = v => { back.remove(); resolve(v); };
+    back.querySelector('#unCancel').onclick = () => close(null);
+    back.querySelector('#unOk').onclick = () => {
+      const v = back.querySelector('#unInput').value.trim();
+      if (!/^[a-zA-Z0-9_.-]{4,40}$/.test(v)) { back.querySelector('#unErr').innerHTML = alertBox('نام کاربری فقط حروف انگلیسی، عدد و . _ - (حداقل ۴ نویسه) باشد.', 'error'); return; }
+      close(v);
+    };
+    back.querySelector('#unInput').focus();
+  });
+}
+
+/* ── Loading button wrapper ────────────────────────────────────── */
+async function withLoading(btn, fn) {
+  if (!btn) return fn();
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  try { return await fn(); }
+  finally { btn.innerHTML = orig; btn.disabled = false; }
+}
+
+/* ── Chart manager (بدون نشتی) ─────────────────────────────────── */
+const chartInstances = {};
+function renderChart(id, config) {
+  if (!$(id)) return;
+  if (chartInstances[id]) { try { chartInstances[id].destroy(); } catch (e) {} }
+  chartInstances[id] = new Chart($(id), config);
+}
+function destroyCharts() {
+  Object.keys(chartInstances).forEach(k => {
+    try { chartInstances[k].destroy(); } catch (e) {}
+    delete chartInstances[k];
+  });
+}
+
+/* ── CSV safe export ───────────────────────────────────────────── */
+function csvCell(v) {
+  let s = String(v ?? '');
+  if (/^[=+\-@]/.test(s)) s = "'" + s; // جلوگیری از CSV injection
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+function downloadCSV(name, rows) {
+  const csv = '\ufeff' + rows.map(r => r.map(csvCell).join(',')).join('\n');
+  const a = document.createElement('a');
+  const u = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.href = u; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(u), 800);
+}
+
+/* ── Auth views ────────────────────────────────────────────────── */
+async function loginView() {
+  destroyCharts();
+  $('topInfo').textContent = 'ورود امن کاربران';
+  app.innerHTML = '<div class="login"><p class="muted">در حال بررسی وضعیت راه‌اندازی…</p></div>';
+  try {
+    const st = await rpc('mc_manager_status');
+    if (st && st.super_setup_required) return superSetupView();
+    state.siteEnabled = !(st && st.site_enabled === false);
+  } catch (e) {
+    app.innerHTML = `<div class="login">
+      <div class="alert error">${esc('وضعیت راه‌اندازی از سرور دریافت نشد. اسکریپت پایگاه داده را در Supabase اجرا کنید.')}</div>
+      <button class="btn" id="retry" style="width:100%">تلاش دوباره</button></div>`;
+    $('retry').onclick = loginView;
+    return;
+  }
+  renderLogin();
+}
+
+function renderLogin() {
+  destroyCharts();
+  const qs = new URLSearchParams(location.search);
+  const linkRole = qs.has('manager') ? 'manager' : qs.has('schooladmin') ? 'school' : '';
+  const managerLink = linkRole === 'manager', schoolLink = linkRole === 'school';
+  app.innerHTML = `<div class="login">
+    <div style="font-size:38px">🔐</div>
+    <h2>${managerLink ? 'ورود مدیر کل' : schoolLink ? 'ورود مدیر مدرسه' : 'ورود به سامانه'}</h2>
+    <p class="muted">${managerLink ? 'نام کاربری و رمزی را که ادمین ارشد به شما داده وارد کنید.' : schoolLink ? 'نام کاربری و رمزی را که مدیر کل برای مدرسه شما ساخته وارد کنید.' : 'نوع حساب خود را انتخاب و اطلاعات ورود را وارد کنید.'}</p>
+    <div class="field ${linkRole ? 'hidden' : ''}"><label>نوع ورود</label>
+      <select id="role">
+        <option value="super">ادمین ارشد (کنترل دسترسی سایت)</option>
+        <option value="manager">مدیر کل سامانه</option>
+        <option value="school">مدیر مدرسه</option>
+      </select>
+    </div>
+    <div class="field" style="margin-top:12px"><label>نام کاربری</label>
+      <input id="username" autocomplete="username" placeholder="نام کاربری"></div>
+    <div class="field" style="margin-top:12px"><label>رمز عبور</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="رمز عبور"></div>
+    <div id="err">${state.siteEnabled === false ? alertBox('دسترسی به سامانه توسط ادمین ارشد قطع شده است. فقط ادمین ارشد می‌تواند وارد شود.', 'error') : ''}</div>
+    <button class="btn" style="width:100%;margin-top:14px" id="login">ورود به پنل</button>
+    <p class="muted" style="font-size:.78rem;margin-top:16px">رأی‌دهندگان از لینک اختصاصی مدرسه وارد می‌شوند.</p>
+  </div>`;
+  if (linkRole) $('role').value = linkRole;
+  $('login').onclick = () => withLoading($('login'), doLogin);
+  $('password').onkeydown = e => { if (e.key === 'Enter') $('login').click(); };
+}
+
+function superSetupView() {
+  destroyCharts();
+  $('topInfo').textContent = 'راه‌اندازی اولیه ادمین ارشد';
+  app.innerHTML = `<div class="login">
+    <div style="font-size:38px">👑</div>
+    <h2>ساخت حساب ادمین ارشد</h2>
+    <p class="muted">ادمین ارشد بالاتر از مدیر کل است و می‌تواند دسترسی همهٔ کاربران را قطع یا وصل کند. این مرحله فقط یک‌بار نمایش داده می‌شود؛ پس از آن حساب مدیر کل ساخته می‌شود.</p>
+    <div class="field"><label>نام کاربری ادمین ارشد</label>
+      <input id="supUser" autocomplete="username" maxlength="40" placeholder="حداقل ۴ نویسه"></div>
+    <div class="field" style="margin-top:12px"><label>رمز عبور</label>
+      <input id="supPass" type="password" autocomplete="new-password" placeholder="حداقل ۱۲ نویسه"></div>
+    <div class="field" style="margin-top:12px"><label>تکرار رمز عبور</label>
+      <input id="supPass2" type="password" autocomplete="new-password"></div>
+    <div id="supMsg"></div>
+    <button class="btn" id="saveSuper" style="width:100%;margin-top:14px">ثبت حساب ادمین ارشد</button>
+  </div>`;
+  $('saveSuper').onclick = () => withLoading($('saveSuper'), async () => {
+    const u = $('supUser').value.trim(), p = $('supPass').value, p2 = $('supPass2').value, msg = $('supMsg');
+    if (u.length < 4) return msg.innerHTML = alertBox('نام کاربری حداقل ۴ نویسه باشد.', 'error');
+    if (!/^[a-zA-Z0-9_.-]+$/.test(u)) return msg.innerHTML = alertBox('نام کاربری فقط حروف انگلیسی، عدد و . _ - باشد.', 'error');
+    if (p.length < 12) return msg.innerHTML = alertBox('رمز عبور حداقل ۱۲ نویسه باشد.', 'error');
+    if (p !== p2) return msg.innerHTML = alertBox('تکرار رمز مطابقت ندارد.', 'error');
+    try {
+      await rpc('mc_super_setup', { username: u, password: p });
+      msg.innerHTML = alertBox('حساب ادمین ارشد ساخته شد. اکنون حساب مدیر کل را بسازید.', 'ok');
+      setTimeout(loginView, 900);
+    } catch (e) { msg.innerHTML = alertBox(e.message, 'error'); }
+  });
+}
+
+async function doLogin() {
+  const role = $('role').value;
+  const u = $('username').value.trim();
+  const p = $('password').value;
+  const err = $('err');
+  err.innerHTML = '';
+  if (!u || !p) { err.innerHTML = alertBox('نام کاربری و رمز عبور را وارد کنید.', 'error'); return; }
+  try {
+    const fn = role === 'super' ? 'mc_super_login' : role === 'manager' ? 'mc_manager_login' : 'mc_school_login';
+    const x = await rpc(fn, { username: u, password: p });
+    state.session = x.token || x.session_token || '';
+    state.role = role;
+    saveSession(role, state.session);
+    if (role === 'super') { state.superData = await rpc('mc_super_state', { token: state.session }); superView(); }
+    else if (role === 'manager') { await loadManager(); managerView(); }
+    else { state.schoolData = await rpc('mc_school_detail', { token: state.session }); schoolView(); }
+  } catch (e) {
+    err.innerHTML = alertBox(e.message, 'error');
+  }
+}
+
+function logout() {
+  state.role = ''; state.session = ''; state.schools = []; state.dashboard = null;
+  state.schoolData = null; state.selectedSchool = null; state.managerSchoolId = null;
+  state.activeTab = 'overview';
+  destroyCharts(); clearSession(); loginView();
+}
+
+function alertBox(msg, type = 'error') {
+  return `<div class="alert ${type}">${esc(msg)}</div>`;
+}
+
+/* ── Manager data layer ────────────────────────────────────────── */
+async function loadManager() {
+  const [schoolsRes, dashRes] = await Promise.all([
+    rpc('mc_manager_schools', { token: state.session }),
+    rpc('mc_manager_dashboard', { token: state.session }),
+  ]);
+  state.schools = Array.isArray(schoolsRes) ? schoolsRes : (schoolsRes?.schools || []);
+  state.dashboard = dashRes || {};
+}
+
+async function refreshManager() {
+  try { await loadManager(); managerView(); toast('به‌روزرسانی شد.'); }
+  catch (e) { toast(e.message, 'error'); }
+}
+
+/* ── Shell / navigation ────────────────────────────────────────── */
+function navButton(id, icon, label, active) {
+  return `<button class="nav ${active ? 'active' : ''}" data-tab="${id}">
+    <span>${icon}</span><span>${label}</span></button>`;
+}
+
+function shell(items, content) {
+  app.innerHTML = `<div class="shell">
+    <div class="layout">
+      <aside class="side">
+        ${items.map(i => i.back
+          ? `<button class="nav" id="navBack"><span>←</span><span>${esc(i.label)}</span></button>`
+          : navButton(i.id, i.icon, i.label, state.activeTab === i.id)
+        ).join('')}
+        <button class="nav" id="logout"><span>↪</span><span>خروج از حساب</span></button>
+      </aside>
+      <main class="main">${content}</main>
+    </div>
+    <div class="foot">سامانه انتخابات مدارس · پنل مدیریتی</div>
+  </div>`;
+  document.querySelectorAll('[data-tab]').forEach(b => {
+    b.onclick = () => { state.activeTab = b.dataset.tab; renderCurrentView(); };
+  });
+  if ($('navBack')) $('navBack').onclick = () => { state.managerSchoolId = null; state.activeTab = 'schools'; managerView(); };
+  $('logout').onclick = logout;
+}
+
+function renderCurrentView() {
+  if (state.role === 'super') { superView(); return; }
+  if (state.role === 'manager') {
+    if (state.managerSchoolId) managerSchoolView();
+    else managerView();
+  } else {
+    schoolView();
+  }
+}
+
+/* ── Super admin: global access kill switch ────────────────────── */
+function superView() {
+  destroyCharts();
+  $('topInfo').textContent = 'ادمین ارشد';
+  const d = state.superData || {};
+  const on = d.site_enabled !== false;
+  shell([{ id: 'super', icon: '👑', label: 'کنترل دسترسی سایت' }], `
+    <div class="pagehead"><div><h2>کنترل دسترسی سایت</h2>
+      <div class="muted">قطع یا وصل فوری دسترسی مدیر کل، مدیران مدارس و رأی‌دهندگان</div></div>
+      <button class="btn light" id="refreshSuper">↻ به‌روزرسانی</button></div>
+    ${stats([
+      ['🌐', 'وضعیت سایت', on ? 'وصل' : 'قطع'],
+      ['🛡️', 'مدیران کل', d.manager_count ?? 0],
+      ['🏫', 'تعداد مدارس', d.school_count ?? 0],
+      ['🔑', 'نشست فعال کاربران', d.active_sessions ?? 0],
+    ])}
+    <section class="panel">
+      <h3>👤 حساب ادمین ارشد</h3>
+      <p class="muted">نام کاربری فعلی: <b dir="ltr" id="supCurUser">…</b>. برای هر تغییر، رمز عبور فعلی لازم است.</p>
+      <div class="formgrid">
+        <div class="field"><label>رمز عبور فعلی</label><input id="supCurPass" type="password" dir="ltr" autocomplete="current-password"></div>
+        <div class="field"><label>نام کاربری جدید</label><input id="supNewUser" dir="ltr" maxlength="40" autocomplete="off" placeholder="حداقل ۴ نویسه انگلیسی"></div>
+      </div>
+      <div class="actions"><button class="btn" id="supChangeUser">تغییر نام کاربری</button></div>
+      <div class="formgrid" style="margin-top:14px">
+        <div class="field"><label>رمز عبور جدید</label><input id="supNewPass" type="password" dir="ltr" autocomplete="new-password" placeholder="حداقل ۱۲ نویسه"></div>
+        <div class="field"><label>تکرار رمز عبور جدید</label><input id="supNewPass2" type="password" dir="ltr" autocomplete="new-password"></div>
+      </div>
+      <div id="supAcctMsg"></div>
+      <div class="actions"><button class="btn" id="supChangePass">تغییر رمز عبور</button></div>
+    </section>
+    <section class="panel">
+      <h3>➕ ساخت حساب مدیر کل</h3>
+      <p class="muted">نام کاربری و رمز را شما تعیین می‌کنید و به مدیر کل می‌دهید. او با لینک زیر وارد می‌شود و هر زمان خواستید می‌توانید دسترسی‌اش را قطع کنید.</p>
+      <div class="formgrid">
+        <div class="field"><label>نام کاربری مدیر کل</label><input id="mgrUser" dir="ltr" maxlength="40" placeholder="حداقل ۴ نویسه انگلیسی"></div>
+        <div class="field"><label>رمز عبور</label><input id="mgrPass" type="text" dir="ltr" autocomplete="off" placeholder="حداقل ۱۲ نویسه"></div>
+      </div>
+      <div id="mgrMsg"></div>
+      <div class="actions"><button class="btn" id="createMgr">ایجاد حساب مدیر کل</button></div>
+      <h3 style="margin-top:18px">لینک ورود مدیر کل</h3>
+      <code class="codebox" id="mgrLink">${esc(location.origin + location.pathname + '?manager')}</code>
+      <div class="actions"><button class="btn light" id="copyMgrLink">کپی لینک</button></div>
+    </section>
+    <section class="panel">
+      <h3>مدیران کل ثبت‌شده</h3>
+      ${(d.managers || []).length ? `<div class="tablewrap"><table>
+        <thead><tr><th>نام کاربری</th><th>مدارس</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+        <tbody>${d.managers.map(m => `<tr>
+          <td dir="ltr" style="text-align:right"><b>${esc(m.username)}</b></td>
+          <td>${fa(m.school_count)}</td>
+          <td><span class="tag ${m.active ? '' : 'off'}">${m.active ? 'فعال' : 'قطع‌شده'}</span></td>
+          <td><div class="actions" style="margin:0">
+            <div class="swrow"><button class="sw ${m.active ? 'on' : ''}" role="switch" aria-checked="${m.active ? 'true' : 'false'}" aria-label="دسترسی ${esc(m.username)}" data-mgr-toggle="${esc(m.id)}" data-active="${m.active ? '1' : '0'}"></button><small>${m.active ? 'وصل' : 'قطع'}</small></div>
+            <button class="btn small light" data-mgr-rename="${esc(m.id)}" data-name="${esc(m.username)}">تغییر نام کاربری</button>
+            <button class="btn small light" data-mgr-reset="${esc(m.id)}">رمز جدید</button>
+            <button class="btn small red" data-mgr-delete="${esc(m.id)}">حذف مدیرکل</button>
+          </div></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">هنوز مدیر کلی ساخته نشده است.</p>'}
+    </section>
+    <section class="panel">
+      <h3>کلید دسترسی مدارس</h3>
+      <p class="muted">هر مدرسه یک کلید دارد. با قطع آن، مدیر مدرسه بیرون انداخته می‌شود و لینک رأی‌دهندگان همان مدرسه هم بسته می‌شود؛ آرا و اطلاعات حفظ می‌شود.</p>
+      <div class="searchbar"><input id="supSchoolSearch" placeholder="جستجوی مدرسه یا مدیر…" value="${esc(state.supQuery || '')}"></div>
+      <div id="supSchoolBox"></div>
+    </section>
+    <section class="panel">
+      <h3>پاک‌سازی کامل نتایج انتخابات</h3>
+      <p class="muted">تمام رأی‌ها و اطلاعات رأی‌دهندگان در همه مدارس حذف می‌شود؛ مدارس، مدیران، حساب‌ها و کاندیداها باقی می‌مانند.</p>
+      <button class="btn red" id="superClearAllResults">حذف نتایج کل سامانه</button>
+    </section>
+    <section class="panel">
+      <h3>کلید قطع سراسری · ${on ? 'سایت برای همه فعال است' : 'سایت برای همه قطع است'}</h3>
+      <p>${on ? '<span class="tag">وصل</span>' : '<span class="tag off">قطع</span>'}
+        <span class="muted"> کلید سراسری: همهٔ مدیران، مدارس و رأی‌دهندگان</span></p>
+      <p class="muted">با قطع دسترسی، تمام نشست‌های مدیر کل و مدارس بلافاصله بسته می‌شود، ورود جدید ممکن نیست و لینک رأی‌دهندگان هم کار نمی‌کند. اطلاعات و آرا حفظ می‌شود و با وصل مجدد همه‌چیز سر جایش است. حساب ادمین ارشد همیشه فعال می‌ماند.</p>
+      ${on ? `<div class="field" style="margin-top:10px"><label>پیام نمایش‌داده‌شده به کاربران (اختیاری)</label>
+        <input id="offMsg" maxlength="300" placeholder="مثلاً: سامانه برای بررسی موقتاً بسته است"></div>` : (d.message ? `<p class="muted">پیام فعلی: ${esc(d.message)}</p>` : '')}
+      <div id="superMsg"></div>
+      <div class="actions"><button class="btn ${on ? 'red' : 'green'}" id="toggleSite">${on ? '⛔ قطع دسترسی همه کاربران' : '✅ وصل مجدد دسترسی'}</button></div>
+    </section>`);
+  $('refreshSuper').onclick = () => withLoading($('refreshSuper'), async () => {
+    try { state.superData = await rpc('mc_super_state', { token: state.session }); superView(); toast('به‌روزرسانی شد.'); }
+    catch (e) { toast(e.message, 'error'); }
+  });
+  const renderSupSchools = () => {
+    const q = (state.supQuery || '').toLowerCase();
+    const list = (d.schools || []).filter(x => !q || (x.name + ' ' + x.manager_username + ' ' + x.username).toLowerCase().includes(q));
+    $('supSchoolBox').innerHTML = list.length ? `<div class="tablewrap"><table>
+      <thead><tr><th>مدرسه</th><th>مدیر کل</th><th>آرا</th><th>دسترسی</th><th>حذف</th></tr></thead>
+      <tbody>${list.map(x => `<tr>
+        <td><b>${esc(x.name)}</b><div class="muted" dir="ltr" style="text-align:right">${esc(x.username)}</div></td>
+        <td dir="ltr" style="text-align:right">${esc(x.manager_username)}</td>
+        <td>${fa(x.vote_count)}</td>
+        <td><div class="swrow"><button class="sw ${x.active ? 'on' : ''}" role="switch" aria-checked="${x.active ? 'true' : 'false'}" aria-label="دسترسی ${esc(x.name)}" data-sch-toggle="${esc(x.id)}" data-active="${x.active ? '1' : '0'}"></button><small>${x.active ? 'وصل' : 'قطع'}</small></div></td>
+        <td><button class="btn small red" data-super-del-school="${esc(x.id)}">حذف مدرسه</button></td>
+      </tr>`).join('')}</tbody></table></div>` : '<p class="muted">مدرسه‌ای پیدا نشد.</p>';
+    document.querySelectorAll('[data-sch-toggle]').forEach(b => b.onclick = async () => {
+      const turnOn = b.dataset.active === '0';
+      if (!await confirmModal(turnOn ? 'دسترسی این مدرسه دوباره وصل شود؟' : 'دسترسی این مدرسه قطع و نشست مدیرش بسته شود؟ لینک رأی‌دهندگان هم بسته می‌شود.', turnOn ? 'وصل' : 'قطع دسترسی', !turnOn)) return;
+      try {
+        await rpc('mc_super_set_school_active', { token: state.session, school_id: b.dataset.schToggle, active: turnOn });
+        state.superData = await rpc('mc_super_state', { token: state.session });
+        superView();
+        toast(turnOn ? 'دسترسی مدرسه وصل شد.' : 'دسترسی مدرسه قطع شد.');
+      } catch (e) { toast(e.message, 'error'); }
+    });
+  };
+  renderSupSchools();
+  $('supSchoolSearch').oninput = e => { state.supQuery = e.target.value.trim(); renderSupSchools(); };
+
+  document.querySelectorAll('[data-mgr-delete]').forEach(b => b.onclick = async () => {
+    if (!await confirmModal('حساب این مدیرکل و تمام مدارس و نتایج وابسته حذف شود؟ این کار برگشت‌پذیر نیست.', 'حذف مدیرکل', true)) return;
+    try {
+      await rpc('mc_super_delete_manager', { token: state.session, manager_id: b.dataset.mgrDelete });
+      state.superData = await rpc('mc_super_state', { token: state.session });
+      superView(); toast('مدیرکل و اطلاعات وابسته حذف شدند.');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+  $('supSchoolBox').onclick = async e => {
+    const b = e.target.closest('[data-super-del-school]');
+    if (!b) return;
+    if (!await confirmModal('مدرسه، کاندیداها، رأی‌دهندگان و نتایج آن حذف شوند؟', 'حذف مدرسه', true)) return;
+    try {
+      await rpc('mc_super_delete_school', { token: state.session, school_id: b.dataset.superDelSchool });
+      state.superData = await rpc('mc_super_state', { token: state.session });
+      superView(); toast('مدرسه و اطلاعات وابسته حذف شدند.');
+    } catch (err) { toast(err.message, 'error'); }
+  };
+  const clearAllSuper = $('superClearAllResults');
+  if (clearAllSuper) clearAllSuper.onclick = () => withLoading(clearAllSuper, async () => {
+    if (!await confirmModal('تمام نتایج و اطلاعات رأی‌دهندگان همه مدارس سامانه پاک شود؟ مدیران، مدارس و کاندیداها باقی می‌مانند.', 'پاک‌سازی کل نتایج', true)) return;
+    try {
+      await rpc('mc_super_clear_all_results', { token: state.session });
+      state.superData = await rpc('mc_super_state', { token: state.session });
+      superView(); toast('نتایج کل سامانه پاک شد.');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+
+  $('createMgr').onclick = () => withLoading($('createMgr'), async () => {
+    const u = $('mgrUser').value.trim(), p = $('mgrPass').value, msg = $('mgrMsg');
+    if (!/^[a-zA-Z0-9_.-]{4,40}$/.test(u)) return msg.innerHTML = alertBox('نام کاربری فقط حروف انگلیسی، عدد و . _ - (حداقل ۴ نویسه) باشد.', 'error');
+    if (p.length < 12) return msg.innerHTML = alertBox('رمز عبور حداقل ۱۲ نویسه باشد.', 'error');
+    try {
+      await rpc('mc_super_create_manager', { token: state.session, username: u, password: p });
+      state.superData = await rpc('mc_super_state', { token: state.session });
+      superView();
+      toast('حساب مدیر کل ساخته شد.');
+    } catch (e) { msg.innerHTML = alertBox(e.message, 'error'); }
+  });
+  $('copyMgrLink').onclick = async () => {
+    try { await navigator.clipboard.writeText($('mgrLink').textContent); toast('لینک کپی شد.'); }
+    catch (e) { toast('کپی ممکن نشد؛ دستی انتخاب کنید.', 'error'); }
+  };
+  document.querySelectorAll('[data-mgr-toggle]').forEach(b => b.onclick = async () => {
+    const turnOn = b.dataset.active === '0';
+    if (!await confirmModal(turnOn ? 'دسترسی این مدیر کل دوباره وصل شود؟' : 'دسترسی این مدیر کل قطع و نشست فعالش بسته شود؟', turnOn ? 'وصل' : 'قطع دسترسی', !turnOn)) return;
+    try {
+      await rpc('mc_super_set_manager_active', { token: state.session, manager_id: b.dataset.mgrToggle, active: turnOn });
+      state.superData = await rpc('mc_super_state', { token: state.session });
+      superView();
+      toast(turnOn ? 'دسترسی وصل شد.' : 'دسترسی قطع شد.');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+  document.querySelectorAll('[data-mgr-reset]').forEach(b => b.onclick = async () => {
+    const pw = await passwordModal('رمز عبور جدید مدیر کل را وارد کنید. نشست فعال او بسته می‌شود.');
+    if (!pw) return;
+    try {
+      await rpc('mc_super_reset_manager_password', { token: state.session, manager_id: b.dataset.mgrReset, password: pw });
+      toast('رمز عبور تغییر کرد.');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+  /* حساب ادمین ارشد: تغییر نام کاربری و رمز */
+  const showCurUser = () => { if ($('supCurUser')) $('supCurUser').textContent = state.superUsername || '—'; };
+  showCurUser();
+  if (!state.superUsername) rpc('mc_super_me', { token: state.session })
+    .then(r => { state.superUsername = r.username; showCurUser(); }).catch(() => {});
+  $('supChangeUser').onclick = () => withLoading($('supChangeUser'), async () => {
+    const cp = $('supCurPass').value, nu = $('supNewUser').value.trim(), msg = $('supAcctMsg');
+    if (!cp) return msg.innerHTML = alertBox('رمز عبور فعلی را وارد کنید.', 'error');
+    if (!/^[a-zA-Z0-9_.-]{4,40}$/.test(nu)) return msg.innerHTML = alertBox('نام کاربری فقط حروف انگلیسی، عدد و . _ - (حداقل ۴ نویسه) باشد.', 'error');
+    try {
+      const r = await rpc('mc_super_change_username', { token: state.session, current_password: cp, new_username: nu });
+      state.superUsername = r.username || nu;
+      $('supCurPass').value = ''; $('supNewUser').value = '';
+      showCurUser();
+      msg.innerHTML = alertBox('نام کاربری ادمین ارشد تغییر کرد. دفعهٔ بعد با نام کاربری جدید وارد شوید.', 'ok');
+      toast('نام کاربری تغییر کرد.');
+    } catch (e) { msg.innerHTML = alertBox(e.message, 'error'); }
+  });
+  $('supChangePass').onclick = () => withLoading($('supChangePass'), async () => {
+    const cp = $('supCurPass').value, np = $('supNewPass').value, np2 = $('supNewPass2').value, msg = $('supAcctMsg');
+    if (!cp) return msg.innerHTML = alertBox('رمز عبور فعلی را وارد کنید.', 'error');
+    if (np.length < 12) return msg.innerHTML = alertBox('رمز عبور جدید حداقل ۱۲ نویسه باشد.', 'error');
+    if (np !== np2) return msg.innerHTML = alertBox('تکرار رمز جدید مطابقت ندارد.', 'error');
+    if (np === cp) return msg.innerHTML = alertBox('رمز جدید باید با رمز فعلی متفاوت باشد.', 'error');
+    try {
+      await rpc('mc_super_change_password', { token: state.session, current_password: cp, new_password: np });
+      ['supCurPass', 'supNewPass', 'supNewPass2'].forEach(id => $(id).value = '');
+      msg.innerHTML = alertBox('رمز عبور ادمین ارشد تغییر کرد. نشست‌های دیگر این حساب بسته شد.', 'ok');
+      toast('رمز عبور تغییر کرد.');
+    } catch (e) { msg.innerHTML = alertBox(e.message, 'error'); }
+  });
+  document.querySelectorAll('[data-mgr-rename]').forEach(b => b.onclick = async () => {
+    const nu = await usernameModal('نام کاربری جدید مدیر کل را وارد کنید.', b.dataset.name || '');
+    if (!nu || nu === b.dataset.name) return;
+    try {
+      await rpc('mc_super_change_manager_username', { token: state.session, manager_id: b.dataset.mgrRename, new_username: nu });
+      state.superData = await rpc('mc_super_state', { token: state.session });
+      superView();
+      toast('نام کاربری مدیر کل تغییر کرد.');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+  $('toggleSite').onclick = () => withLoading($('toggleSite'), async () => {
+    const msg = on ? ($('offMsg')?.value || '').trim() : null;
+    const q = on ? 'دسترسی همهٔ کاربران قطع و همهٔ نشست‌های فعال بسته می‌شود. ادامه می‌دهید؟' : 'دسترسی همهٔ کاربران دوباره وصل شود؟';
+    if (!await confirmModal(q, on ? 'قطع دسترسی' : 'وصل دسترسی', on)) return;
+    try {
+      await rpc('mc_super_set_site', { token: state.session, enabled: !on, message: msg });
+      state.superData = await rpc('mc_super_state', { token: state.session });
+      superView();
+      toast(on ? 'دسترسی همه قطع شد.' : 'دسترسی دوباره وصل شد.');
+    } catch (e) { $('superMsg').innerHTML = alertBox(e.message, 'error'); }
+  });
+}
+
+/* ── Manager overview ──────────────────────────────────────────── */
+const managerTabs = [
+  { id: 'overview', icon: '▦', label: 'داشبورد کل' },
+  { id: 'schools', icon: '🏫', label: 'مدیریت مدارس' },
+  { id: 'results', icon: '🏆', label: 'نتایج همه مدارس' },
+  { id: 'reports', icon: '📊', label: 'گزارش و رتبه‌بندی' },
+];
+
+function managerView() {
+  state.managerSchoolId = null;
+  $('topInfo').textContent = 'مدیر کل سامانه';
+  let content = '';
+  if (state.activeTab === 'overview') content = managerOverview();
+  else if (state.activeTab === 'schools') content = managerSchools();
+  else if (state.activeTab === 'results') content = managerResults();
+  else if (state.activeTab === 'reports') content = managerReports();
+  shell(managerTabs, content);
+  if (state.activeTab === 'overview') drawOverviewCharts();
+  if (state.activeTab === 'schools') bindSchoolsTab();
+  if (state.activeTab === 'results' || state.activeTab === 'reports') bindResultsTab();
+}
+
+function stats(items) {
+  return `<div class="grid">${items.map(x => `
+    <div class="stat">
+      <div class="ico">${x[0]}</div>
+      <small>${esc(x[1])}</small>
+      <strong>${typeof x[2] === 'number' ? fa(x[2]) : esc(x[2] ?? '—')}</strong>
+    </div>`).join('')}</div>`;
+}
+
+function managerOverview() {
+  const d = state.dashboard || {};
+  return `
+    <div class="pagehead">
+      <div><h2>داشبورد مدیریتی</h2><div class="muted">نمای کلی عملکرد انتخابات در تمام مدارس</div></div>
+      <button class="btn light" id="refreshMgr">↻ به‌روزرسانی</button>
+    </div>
+    ${stats([
+      ['🏫', 'تعداد مدارس', d.school_count],
+      ['🗳️', 'کل آرای ثبت‌شده', d.total_votes],
+      ['👥', 'کل رأی‌دهندگان', d.total_voters],
+      ['✅', 'مدارس فعال', d.active_schools],
+    ])}
+    <div class="formgrid">
+      <section class="panel"><h3>میزان مشارکت مدارس</h3><div class="chartbox"><canvas id="schoolChart"></canvas></div></section>
+      <section class="panel"><h3>وضعیت انتخابات</h3><div class="chartbox"><canvas id="statusChart"></canvas></div></section>
+    </div>
+    <section class="panel"><h3>آخرین آمار مدارس</h3>${schoolTable(state.schools.slice(0, 8))}</section>`;
+}
+
+function schoolTable(list) {
+  if (!list.length) return '<p class="muted">هنوز مدرسه‌ای ثبت نشده است.</p>';
+  return `<div class="tablewrap"><table>
+    <thead><tr><th>مدرسه</th><th>کاندیدا</th><th>آرا</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+    <tbody>${list.map(s => `
+      <tr>
+        <td><b>${esc(s.name)}</b></td>
+        <td>${fa(s.candidate_count)}</td>
+        <td>${fa(F.votes(s))}</td>
+        <td><span class="tag ${s.active === false ? 'off' : ''}">${s.active === false ? 'غیرفعال' : 'فعال'}</span></td>
+        <td><div class="actions" style="margin:0"><button class="btn small light" data-enter="${esc(s.id)}">مشاهده پنل</button><button class="btn small red" data-delete-school="${esc(s.id)}">حذف مدرسه</button></div></td>
+      </tr>`).join('')}</tbody></table></div>`;
+}
+
+function drawOverviewCharts() {
+  const d = state.dashboard || {};
+  const labels = (d.schools || []).map(s => s.name);
+  const values = (d.schools || []).map(s => F.votes(s));
+  renderChart('schoolChart', {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'تعداد رأی', data: values, borderRadius: 7, backgroundColor: '#6558d9' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+  const active = d.active_schools || 0;
+  const total = d.school_count || 0;
+  renderChart('statusChart', {
+    type: 'doughnut',
+    data: { labels: ['فعال', 'غیرفعال'], datasets: [{ data: [active, Math.max(0, total - active)], backgroundColor: ['#0e9f79', '#e6e9f1'] }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+}
+
+/* ── Manager: schools ──────────────────────────────────────────── */
+function managerSchools() {
+  return `
+    <div class="pagehead"><div><h2>مدیریت مدارس</h2><div class="muted">ایجاد حساب مستقل و تعیین دسترسی هر مدرسه</div></div></div>
+    <section class="panel">
+      <h3>🔗 لینک ورود مدیران مدارس</h3>
+      <p class="muted">این لینک را به مدیر هر مدرسه بدهید. او با نام کاربری و رمزی که شما برای مدرسه‌اش ساخته‌اید وارد پنل مدرسه می‌شود.</p>
+      <code class="codebox" id="schoolLoginLink">${esc(location.origin + location.pathname + '?schooladmin')}</code>
+      <div class="actions"><button class="btn light" id="copySchoolLoginLink">کپی لینک</button></div>
+    </section>
+    <section class="panel">
+      <h3>➕ ایجاد مدرسه جدید</h3>
+      <div class="formgrid three">
+        <div class="field"><label>نام مدرسه</label><input id="sname" placeholder="مثلاً دبیرستان شهید بهشتی"></div>
+        <div class="field"><label>نام کاربری مدرسه</label><input id="suser" placeholder="username"></div>
+        <div class="field"><label>رمز عبور اولیه</label><input id="spass" type="password" placeholder="حداقل ۱۲ کاراکتر"></div>
+      </div>
+      <div class="actions"><button class="btn" id="createSchool">ایجاد حساب مدرسه</button></div>
+      <div id="schoolMsg"></div>
+    </section>
+    <section class="panel">
+      <h3>فهرست مدارس ثبت‌شده</h3>
+      <div class="searchbar">
+        <input id="schoolSearch" placeholder="جستجو بر اساس نام…" value="${esc(state.schoolsQuery)}">
+      </div>
+      <div id="schoolListBox"></div>
+    </section>`;
+}
+
+function bindSchoolsTab() {
+  const cpl = $('copySchoolLoginLink');
+  if (cpl) cpl.onclick = async () => {
+    try { await navigator.clipboard.writeText($('schoolLoginLink').textContent); toast('لینک کپی شد.'); }
+    catch (e) { toast('کپی ممکن نشد؛ دستی انتخاب کنید.', 'error'); }
+  };
+  const createBtn = $('createSchool');
+  if (createBtn) createBtn.onclick = () => withLoading(createBtn, async () => {
+    const name = $('sname').value.trim();
+    const username = $('suser').value.trim();
+    const password = $('spass').value;
+    const msg = $('schoolMsg');
+    if (!name || !username) return msg.innerHTML = alertBox('نام مدرسه و نام کاربری لازم است.', 'error');
+    if (!/^[a-zA-Z0-9_.-]+$/.test(username)) return msg.innerHTML = alertBox('نام کاربری فقط حروف انگلیسی، عدد و . _ - باشد.', 'error');
+    if (password.length < 12) return msg.innerHTML = alertBox('رمز عبور حداقل ۱۲ نویسه باشد.', 'error');
+    try {
+      await rpc('mc_manager_create_school', { token: state.session, name, username, password });
+      msg.innerHTML = alertBox('حساب مدرسه ایجاد شد.', 'ok');
+      $('sname').value = ''; $('suser').value = ''; $('spass').value = '';
+      await loadManager(); managerView();
+      toast('مدرسه ثبت شد.');
+    } catch (e) { msg.innerHTML = alertBox(e.message, 'error'); }
+  });
+
+  const search = $('schoolSearch');
+  if (search) search.oninput = () => {
+    state.schoolsQuery = search.value.trim();
+    state.schoolsPage = 0;
+    renderSchoolList();
+  };
+  renderSchoolList();
+}
+
+function filteredSchools() {
+  const q = state.schoolsQuery.toLowerCase();
+  if (!q) return state.schools;
+  return state.schools.filter(s => String(s.name || '').toLowerCase().includes(q));
+}
+
+function renderSchoolList() {
+  const list = filteredSchools();
+  const total = list.length;
+  const pages = Math.max(1, Math.ceil(total / SCHOOLS_PAGE_SIZE));
+  if (state.schoolsPage >= pages) state.schoolsPage = pages - 1;
+  const start = state.schoolsPage * SCHOOLS_PAGE_SIZE;
+  const slice = list.slice(start, start + SCHOOLS_PAGE_SIZE);
+  const box = $('schoolListBox');
+  if (!box) return;
+  box.innerHTML = slice.length
+    ? schoolTable(slice) + (pages > 1 ? pagination(pages, state.schoolsPage) : '')
+    : '<p class="muted">نتیجه‌ای یافت نشد.</p>';
+
+  document.querySelectorAll('[data-enter]').forEach(b => {
+    b.onclick = () => enterSchool(b.dataset.enter);
+  });
+  box.querySelectorAll('[data-delete-school]').forEach(b => b.onclick = async () => {
+    if (!await confirmModal('این مدرسه و تمام کاندیداها، رأی‌دهندگان و نتایج آن حذف شوند؟', 'حذف مدرسه', true)) return;
+    try {
+      await rpc('mc_manager_delete_school', { token: state.session, school_id: b.dataset.deleteSchool });
+      await loadManager(); managerView(); toast('مدرسه و اطلاعات وابسته حذف شدند.');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+
+  box.querySelectorAll('[data-page]').forEach(b => {
+    b.onclick = () => { state.schoolsPage = +b.dataset.page; renderSchoolList(); };
+  });
+}
+
+function pagination(pages, current) {
+  const btn = (i) => `<button data-page="${i}" class="${i === current ? 'active' : ''}">${fa(i + 1)}</button>`;
+  const arr = [];
+  const from = Math.max(0, current - 2), to = Math.min(pages - 1, current + 2);
+  if (current > 0) arr.push(`<button data-page="${current - 1}">›</button>`);
+  for (let i = from; i <= to; i++) arr.push(btn(i));
+  if (current < pages - 1) arr.push(`<button data-page="${current + 1}">‹</button>`);
+  return `<div class="pagination">${arr.reverse().join('')}</div>`;
+}
+
+/* ── Manager: drill-down into a school ─────────────────────────── */
+async function enterSchool(id) {
+  try {
+    state.schoolData = await rpc('mc_manager_school_detail', { token: state.session, school_id: id });
+    state.selectedSchool = state.schoolData?.school || state.schools.find(s => String(s.id) === String(id));
+    state.managerSchoolId = id;
+    state.activeTab = 'overview';
+    managerSchoolView();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function managerSchoolView() {
+  const d = state.schoolData || {};
+  const subTabs = [
+    { id: 'overview', icon: '▦', label: 'خلاصه مدرسه' },
+    { id: 'candidates', icon: '👤', label: 'کاندیداها و آرا' },
+  ];
+  const title = state.selectedSchool?.name || d.school?.name || 'مدرسه';
+
+  let content = '';
+  if (state.activeTab === 'overview') {
+    const cands = F.candList(d);
+    content = `
+      <div class="pagehead"><div><h2>${esc(title)}</h2><div class="muted">مشاهده مدیریتی مدرسه انتخاب‌شده</div></div></div>
+      ${stats([
+        ['👥', 'رأی‌دهندگان', d.total_voters ?? 0],
+        ['🗳️', 'آرای ثبت‌شده', d.total_votes ?? 0],
+        ['🧑‍🎓', 'کاندیداها', cands.length],
+        ['🏆', 'نفرات برتر', d.winners_count ?? 0],
+      ])}
+      <section class="panel"><h3>وضعیت</h3>
+        <p>${d.open ? '<span class="tag">رأی‌گیری فعال است</span>' : '<span class="tag off">رأی‌گیری بسته است</span>'}</p>
+      </section>
+      <section class="panel"><h3>کاندیداها و نتایج</h3>
+        ${rankTable(cands.slice().sort((a, b) => F.votes(b) - F.votes(a)), false)}
+      </section>`;
+  } else if (state.activeTab === 'candidates') {
+    const cands = F.candList(d);
+    content = `
+      <div class="pagehead"><div><h2>کاندیداها و آرا</h2><div class="muted">${esc(title)}</div></div></div>
+      <section class="panel"><h3>رتبه‌بندی کاندیداها</h3>
+        ${rankTable(cands.slice().sort((a, b) => F.votes(b) - F.votes(a)), false)}
+      </section>`;
+  }
+
+  // شل سفارشی: دکمه بازگشت + زیرمنو
+  app.innerHTML = `<div class="shell">
+    <div class="layout">
+      <aside class="side">
+        <button class="nav" id="navBack"><span>←</span><span>بازگشت به مدیر کل</span></button>
+        ${subTabs.map(t => navButton(t.id, t.icon, t.label, state.activeTab === t.id)).join('')}
+        <button class="nav" id="logout"><span>↪</span><span>خروج</span></button>
+      </aside>
+      <main class="main">${content}</main>
+    </div>
+    <div class="foot">سامانه انتخابات مدارس · پنل مدیریتی</div>
+  </div>`;
+  $('navBack').onclick = () => { state.managerSchoolId = null; state.activeTab = 'schools'; managerView(); };
+  document.querySelectorAll('[data-tab]').forEach(b => {
+    b.onclick = () => { state.activeTab = b.dataset.tab; managerSchoolView(); };
+  });
+  $('logout').onclick = logout;
+}
+
+/* ── Manager: results & reports ────────────────────────────────── */
+function managerResults() {
+  const opts = state.schools.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  return `
+    <div class="pagehead"><div><h2>نتایج تمام مدارس</h2><div class="muted">مشاهده مجموع آرا و مقایسه مدارس</div></div>
+      <button class="btn light" id="refreshMgr2">↻ به‌روزرسانی</button></div>
+    <section class="panel">
+      <div class="formgrid">
+        <div class="field"><label>انتخاب مدرسه</label>
+          <select id="schoolFilter"><option value="all">تمام مدارس</option>${opts}</select></div>
+        <div class="field"><label>تعداد نفرات برتر</label>
+          <input id="topN" type="number" min="1" max="500" value="10"></div>
+      </div>
+      <div class="actions"><button class="btn" id="showResults">نمایش نتایج</button></div>
+      <div class="actions"><button class="btn red" id="clearManagerResults">پاک‌کردن نتایج مدرسه انتخاب‌شده / همه مدارس</button></div>
+    </section>
+    <section class="panel" id="resultPanel"><h3>آمار تجمیعی</h3>${schoolTable(state.schools)}</section>`;
+}
+
+function managerReports() {
+  const opts = state.schools.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  return `
+    <div class="pagehead"><div><h2>گزارش و رتبه‌بندی</h2><div class="muted">رتبه‌بندی کاندیداها با فیلتر مدرسه</div></div></div>
+    <section class="panel">
+      <div class="formgrid">
+        <div class="field"><label>مدرسه موردنظر</label>
+          <select id="schoolFilter"><option value="all">تمام مدارس</option>${opts}</select></div>
+        <div class="field"><label>تعداد نفرات برتر</label>
+          <input id="topN" type="number" min="1" max="500" value="10"></div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="showResults">تهیه گزارش</button>
+        <button class="btn light" id="exportRank" disabled>خروجی CSV</button>
+      </div>
+    </section>
+    <section class="panel" id="resultPanel"><p class="muted">مدرسه و تعداد نفرات را انتخاب کنید.</p></section>`;
+}
+
+function bindResultsTab() {
+  const refreshBtn = $('refreshMgr2');
+  if (refreshBtn) refreshBtn.onclick = () => withLoading(refreshBtn, refreshManager);
+
+
+  const clearManagerResults = $('clearManagerResults');
+  if (clearManagerResults) clearManagerResults.onclick = () => withLoading(clearManagerResults, async () => {
+    const sid = $('schoolFilter').value;
+    const label = sid === 'all' ? 'تمام مدارس تحت مدیریت شما' : 'مدرسه انتخاب‌شده';
+    if (!await confirmModal('نتایج و اطلاعات رأی‌دهندگان ' + label + ' پاک شود؟ مدارس و کاندیداها باقی می‌مانند.', 'پاک‌سازی نتایج', true)) return;
+    try {
+      await rpc('mc_manager_clear_results', { token: state.session, school_id: sid === 'all' ? null : sid });
+      await loadManager(); managerView(); toast('نتایج پاک شدند.');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+  const showBtn = $('showResults');
+  if (showBtn) showBtn.onclick = () => withLoading(showBtn, async () => {
+    const sid = $('schoolFilter').value;
+    const n = Math.max(1, Math.min(500, +$('topN').value || 10));
+    try {
+      const data = await rpc('mc_manager_results', {
+        token: state.session,
+        school_id: sid === 'all' ? null : sid,
+        limit: n
+      });
+      state.lastRanks = data.rows || data.candidates || [];
+      const title = sid === 'all' ? 'تمام مدارس' : (state.schools.find(s => String(s.id) === sid)?.name || '');
+      $('resultPanel').innerHTML = `
+        <h3>رتبه‌بندی: ${esc(title)}</h3>
+        <p class="muted">تعداد رأی‌دهندگان: ${fa(data.total_voters)} · مجموع آرا: ${fa(data.total_votes)}</p>
+        ${rankTable(state.lastRanks, true)}`;
+      const ex = $('exportRank');
+      if (ex) {
+        ex.disabled = state.lastRanks.length === 0;
+        ex.onclick = () => downloadCSV('ranking.csv', [
+          ['رتبه', 'نام کاندیدا', 'مدرسه', 'تعداد رأی'],
+          ...state.lastRanks.map((r, i) => [F.rank(r, i), F.name(r), F.school(r), F.votes(r)])
+        ]);
+      }
+    } catch (e) { $('resultPanel').innerHTML = alertBox(e.message, 'error'); }
+  });
+}
+
+function rankTable(rows, showSchool = false) {
+  if (!rows.length) return '<p class="muted">داده‌ای برای نمایش وجود ندارد.</p>';
+  return `<div class="tablewrap"><table>
+    <thead><tr><th>رتبه</th><th>کاندیدا</th>${showSchool ? '<th>مدرسه</th>' : ''}<th>تعداد رأی</th></tr></thead>
+    <tbody>${rows.map((r, i) => `
+      <tr>
+        <td><span class="ranknum">${fa(F.rank(r, i))}</span></td>
+        <td><b>${esc(F.name(r))}</b></td>
+        ${showSchool ? `<td>${esc(F.school(r))}</td>` : ''}
+        <td>${fa(F.votes(r))}</td>
+      </tr>`).join('')}</tbody></table></div>`;
+}
+
+/* ── School admin views ────────────────────────────────────────── */
+const schoolTabs = [
+  { id: 'overview', icon: '▦', label: 'داشبورد مدرسه' },
+  { id: 'candidates', icon: '👤', label: 'مدیریت کاندیداها' },
+  { id: 'results', icon: '🏆', label: 'نتایج و آرا' },
+  { id: 'settings', icon: '⚙️', label: 'تنظیمات و لینک' },
+];
+
+function schoolView() {
+  $('topInfo').textContent = 'پنل مدیریت مدرسه';
+  let c = '';
+  if (state.activeTab === 'overview') c = schoolOverview();
+  else if (state.activeTab === 'candidates') c = schoolCandidates();
+  else if (state.activeTab === 'results') c = schoolResults();
+  else if (state.activeTab === 'settings') c = schoolSettings();
+  shell(schoolTabs, c);
+  if (state.activeTab === 'results') drawSchoolResultsChart();
+  bindSchoolActions();
+}
+
+function schoolOverview() {
+  const d = state.schoolData || {};
+  return `
+    <div class="pagehead">
+      <div><h2>داشبورد مدرسه</h2><div class="muted">${esc(d.school?.name || state.selectedSchool?.name || 'مدرسه شما')}</div></div>
+      <button class="btn light" id="refreshSchool">↻ به‌روزرسانی</button>
+    </div>
+    ${stats([
+      ['🧑‍🎓', 'کاندیداها', F.candList(d).length],
+      ['🗳️', 'آرای ثبت‌شده', d.total_votes ?? 0],
+      ['👥', 'رأی‌دهندگان', d.total_voters ?? 0],
+      ['🟢', 'وضعیت', d.open ? 'باز' : 'بسته'],
+    ])}
+    <section class="panel"><h3>وضعیت انتخابات</h3>
+      <p>${d.open ? '<span class="tag">رأی‌گیری فعال است</span>' : '<span class="tag off">رأی‌گیری بسته است</span>'}</p>
+      <p class="muted">برای مشاهده جزئیات از منوی کناری استفاده کنید.</p>
+    </section>`;
+}
+
+function schoolCandidates() {
+  return `
+    <div class="pagehead"><div><h2>مدیریت کاندیداها</h2><div class="muted">هر خط یک کاندیدا</div></div></div>
+    <section class="panel">
+      <h3>افزودن کاندیدا</h3>
+      <div class="field"><label>نام و نام خانوادگی کاندیداها</label>
+        <textarea id="candidateNames" rows="5" placeholder="علی محمدی&#10;سارا احمدی"></textarea></div>
+      <div class="actions"><button class="btn" id="addCandidates">افزودن کاندیداها</button></div>
+      <div id="candidateMsg"></div>
+    </section>
+    <section class="panel"><h3>فهرست کاندیداها</h3>
+      ${candidateTable(F.candList(state.schoolData || {}))}
+    </section>`;
+}
+
+function candidateTable(rows) {
+  if (!rows.length) return '<p class="muted">هنوز کاندیدایی ثبت نشده است.</p>';
+  return `<div class="tablewrap"><table>
+    <thead><tr><th>نام کاندیدا</th><th>تعداد رأی</th><th>عملیات</th></tr></thead>
+    <tbody>${rows.map(c => `
+      <tr>
+        <td>${esc(c.name)}</td>
+        <td>${fa(F.votes(c))}</td>
+        <td><button class="btn red small" data-del-candidate="${esc(c.id)}">حذف</button></td>
+      </tr>`).join('')}</tbody></table></div>`;
+}
+
+function schoolResults() {
+  const rows = F.candList(state.schoolData || {}).slice().sort((a, b) => F.votes(b) - F.votes(a));
+  const total = state.schoolData?.total_voters || 0;
+  return `
+    <div class="pagehead">
+      <div><h2>نتایج انتخابات</h2><div class="muted">شمارش و رتبه‌بندی کاندیداها</div></div>
+      <button class="btn light" id="refreshSchool">↻ به‌روزرسانی</button>
+    </div>
+    ${stats([
+      ['👥', 'تعداد رأی‌دهندگان', total],
+      ['🗳️', 'آرای ثبت‌شده', state.schoolData?.total_votes ?? 0],
+      ['🏆', 'نفر اول', rows[0]?.name || '—'],
+      ['📌', 'تعداد کاندیداها', rows.length],
+    ])}
+    <div class="actions"><button class="btn red" id="clearSchoolResults">حذف تمام نتایج این مدرسه</button></div>
+    <div class="formgrid">
+      <section class="panel"><h3>نمودار آرا</h3><div class="chartbox"><canvas id="schoolResultChart"></canvas></div></section>
+      <section class="panel"><h3>رتبه‌بندی کاندیداها</h3>${rankTable(rows, false)}</section>
+    </div>`;
+}
+
+function drawSchoolResultsChart() {
+  const rows = F.candList(state.schoolData || {});
+  renderChart('schoolResultChart', {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => r.name),
+      datasets: [{ label: 'تعداد رأی', data: rows.map(F.votes), borderRadius: 7, backgroundColor: '#5145cd' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+}
+
+function schoolSettings() {
+  const d = state.schoolData || {};
+  const slug = d.school?.slug || d.school?.id || '';
+  const link = location.origin + location.pathname + '?school=' + encodeURIComponent(slug);
+  return `
+    <div class="pagehead"><div><h2>تنظیمات انتخابات</h2><div class="muted">تعیین شرایط رأی‌گیری و لینک اختصاصی</div></div></div>
+    <section class="panel">
+      <h3>تنظیمات</h3>
+      <div class="formgrid">
+        <div class="field"><label>عنوان انتخابات</label>
+          <input id="electionTitle" value="${esc(d.title || 'انتخابات شورای دانش‌آموزی')}"></div>
+        <div class="field"><label>حداکثر انتخاب هر رأی‌دهنده</label>
+          <input id="pickCount" type="number" min="1" max="50" value="${esc(d.picks || 5)}"></div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="saveSettings">ذخیره تنظیمات</button>
+        <button class="btn ${d.open ? 'red' : 'green'}" id="toggleElection">
+          ${d.open ? 'بستن رأی‌گیری' : 'بازکردن رأی‌گیری'}
+        </button>
+      </div>
+      <div id="settingsMsg"></div>
+    </section>
+    <section class="panel">
+      <h3>لینک اختصاصی رأی‌دهندگان</h3>
+      <p class="muted">این لینک را فقط در اختیار رأی‌دهندگان همین مدرسه قرار دهید.</p>
+      <code class="codebox" id="voterLink">${esc(link)}</code>
+      <div class="actions"><button class="btn light" id="copyLink">کپی لینک</button></div>
+    </section>`;
+}
+
+async function reloadSchoolData() {
+  state.schoolData = await rpc('mc_school_detail', { token: state.session });
+}
+
+function bindSchoolActions() {
+  const clearSchoolResults = $('clearSchoolResults');
+  if (clearSchoolResults) clearSchoolResults.onclick = () => withLoading(clearSchoolResults, async () => {
+    if (!await confirmModal('تمام رأی‌ها و اطلاعات رأی‌دهندگان این مدرسه حذف شود؟ کاندیداها و تنظیمات باقی می‌مانند.', 'حذف نتایج', true)) return;
+    try {
+      await rpc('mc_school_clear_results', { token: state.session });
+      await reloadSchoolData(); schoolView(); toast('نتایج این مدرسه پاک شدند.');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+  const refresh = $('refreshSchool');
+  if (refresh) refresh.onclick = () => withLoading(refresh, async () => {
+    try { await reloadSchoolData(); schoolView(); toast('به‌روزرسانی شد.'); }
+    catch (e) { toast(e.message, 'error'); }
+  });
+
+  const add = $('addCandidates');
+  if (add) add.onclick = () => withLoading(add, async () => {
+    const names = $('candidateNames').value.split('\n').map(x => x.trim()).filter(Boolean);
+    if (!names.length) return toast('حداقل یک نام وارد کنید.', 'error');
+    try {
+      await rpc('mc_school_add_candidates', { token: state.session, names });
+      await reloadSchoolData();
+      schoolView();
+      toast('کاندیداها افزوده شدند.');
+    } catch (e) { $('candidateMsg').innerHTML = alertBox(e.message, 'error'); }
+  });
+
+  document.querySelectorAll('[data-del-candidate]').forEach(b => {
+    b.onclick = async () => {
+      if (!await confirmModal('این کاندیدا و تمام آرایی که به نام او ثبت شده حذف می‌شود. سایر آرای انتخابات باقی می‌مانند. ادامه می‌دهید؟', 'حذف کاندیدا و آرای او', true)) return;
+      try {
+        await rpc('mc_school_delete_candidate', { token: state.session, candidate_id: b.dataset.delCandidate });
+        await reloadSchoolData();
+        schoolView();
+        toast('کاندیدا حذف شد.');
+      } catch (e) { toast(e.message, 'error'); }
+    };
+  });
+
+  const save = $('saveSettings');
+  if (save) save.onclick = () => withLoading(save, async () => {
+    try {
+      await rpc('mc_school_settings', {
+        token: state.session,
+        title: $('electionTitle').value,
+        picks: +$('pickCount').value || 1
+      });
+      await reloadSchoolData();
+      schoolView();
+      toast('تنظیمات ذخیره شد.');
+    } catch (e) { $('settingsMsg').innerHTML = alertBox(e.message, 'error'); }
+  });
+
+  const tog = $('toggleElection');
+  if (tog) tog.onclick = () => withLoading(tog, async () => {
+    const action = state.schoolData?.open ? 'بستن' : 'بازکردن';
+    if (!await confirmModal(`آیا از ${action} رأی‌گیری مطمئن هستید؟`, 'تأیید', !!state.schoolData?.open)) return;
+    try {
+      await rpc('mc_school_settings', { token: state.session, open: !state.schoolData?.open });
+      await reloadSchoolData();
+      schoolView();
+      toast(`رأی‌گیری ${action === 'بستن' ? 'بسته' : 'باز'} شد.`);
+    } catch (e) { toast(e.message, 'error'); }
+  });
+
+  const cp = $('copyLink');
+  if (cp) cp.onclick = async () => {
+    const link = $('voterLink')?.textContent || '';
+    try {
+      await navigator.clipboard.writeText(link);
+      cp.textContent = 'کپی شد ✓';
+      toast('لینک کپی شد.');
+    } catch (e) { toast('کپی ممکن نشد؛ دستی انتخاب کنید.', 'error'); }
+  };
+}
+
+/* ── Voter view ────────────────────────────────────────────────── */
+async function voterView(slug) {
+  $('topInfo').textContent = 'درگاه رأی‌دهندگان';
+  app.innerHTML = '<div class="voter"><section class="panel">در حال دریافت اطلاعات انتخابات…</section></div>';
+  try {
+    const p = await rpc('mc_public_election', { school_slug: slug });
+    renderVoter(p, slug);
+  } catch (e) {
+    app.innerHTML = `<div class="voter"><section class="panel">${alertBox(e.message, 'error')}</section></div>`;
+  }
+}
+
+function renderVoter(p, slug) {
+  if (!p.open) {
+    app.innerHTML = `<div class="voter"><section class="panel" style="text-align:center">
+      <div style="font-size:48px">🔒</div>
+      <h2>رأی‌گیری بسته است</h2>
+      <p class="muted">${esc(p.school_name || '')}</p>
+    </section></div>`;
+    return;
+  }
+
+  const picks = Math.max(1, Number(p.picks) || 1);
+  const candidates = Array.isArray(p.candidates) ? p.candidates : [];
+
+  app.innerHTML = `<div class="voter">
+    <section class="panel">
+      <h2>${esc(p.title || 'انتخابات شورای دانش‌آموزی')}</h2>
+      <p class="muted">${esc(p.school_name || '')}</p>
+
+      <div class="formgrid" style="margin-top:12px">
+        <div class="field"><label>نام</label><input id="vfn" autocomplete="given-name" maxlength="60"></div>
+        <div class="field"><label>نام خانوادگی</label><input id="vln" autocomplete="family-name" maxlength="60"></div>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>کد ملی (برای جلوگیری از رأی تکراری)</label>
+        <input id="vnid" inputmode="numeric" maxlength="10" placeholder="۱۰ رقم" autocomplete="off">
+        <small class="muted">کد ملی تنها برای ثبت یکتای رأی استفاده می‌شود و نمایش داده نمی‌شود.</small>
+      </div>
+
+      <h3 style="margin-top:18px">کاندیداها · حداکثر ${fa(picks)} انتخاب</h3>
+      <div id="candList">
+        ${candidates.map(c => `
+          <label class="candidate">
+            <input type="checkbox" value="${esc(c.id)}">
+            <b>${esc(c.name)}</b>
+          </label>`).join('')}
+      </div>
+      <div id="voteMsg"></div>
+      <button class="btn" id="castVote" style="width:100%;margin-top:14px">ثبت نهایی رأی</button>
+    </section>
+  </div>`;
+
+  const boxes = () => [...document.querySelectorAll('.candidate input')];
+
+  boxes().forEach(x => x.onchange = () => {
+    const checked = boxes().filter(i => i.checked);
+    if (checked.length > picks) {
+      x.checked = false;
+      $('voteMsg').innerHTML = alertBox(`حداکثر ${fa(picks)} کاندیدا مجاز است.`, 'error');
+      return;
+    }
+    $('voteMsg').innerHTML = '';
+    x.closest('.candidate').classList.toggle('selected', x.checked);
+  });
+
+  const submit = $('castVote');
+  submit.onclick = () => withLoading(submit, async () => {
+    const fname = $('vfn').value.trim();
+    const lname = $('vln').value.trim();
+    const national_id = $('vnid').value.replace(/\D/g, '');
+    const ids = boxes().filter(x => x.checked).map(x => x.value);
+    const msg = $('voteMsg');
+
+    if (!fname) return msg.innerHTML = alertBox('نام را وارد کنید.', 'error');
+    if (!lname) return msg.innerHTML = alertBox('نام خانوادگی را وارد کنید.', 'error');
+    if (national_id.length !== 10) return msg.innerHTML = alertBox('کد ملی باید ۱۰ رقم باشد.', 'error');
+    if (!ids.length) return msg.innerHTML = alertBox('حداقل یک کاندیدا را انتخاب کنید.', 'error');
+    if (ids.length > picks) return msg.innerHTML = alertBox('تعداد انتخاب‌ها بیش از حد مجاز است.', 'error');
+
+    if (!await confirmModal('رأی شما نهایی می‌شود و امکان تغییر وجود ندارد. ادامه می‌دهید؟', 'ثبت رأی')) return;
+
+    try {
+      const res = await rpc('mc_cast_vote', {
+        school_slug: slug,
+        fname, lname, national_id,
+        candidate_ids: ids
+      });
+      const tracking = res?.tracking_code || res?.code || ('V-' + Date.now().toString(36).toUpperCase());
+      app.innerHTML = `<div class="voter"><section class="panel" style="text-align:center">
+        <div style="font-size:56px">✅</div>
+        <h2>رأی شما با موفقیت ثبت شد.</h2>
+        <p class="muted">از مشارکت شما سپاسگزاریم.</p>
+        <div class="tracking">
+          <div>کد پیگیری رأی شما</div>
+          <div class="code">${esc(tracking)}</div>
+        </div>
+        <p class="muted" style="font-size:.8rem">این کد را برای پیگیری نزد خود نگه دارید.</p>
+      </section></div>`;
+    } catch (e) {
+      msg.innerHTML = alertBox(e.message || 'ثبت رأی انجام نشد.', 'error');
+    }
+  });
+}
+
+/* ── Init ──────────────────────────────────────────────────────── */
+async function init() {
+  const params = new URLSearchParams(location.search);
+  if (params.has('school')) {
+    voterView(params.get('school'));
+    return;
+  }
+  const saved = readSession();
+  if (saved?.token && saved?.role) {
+    state.role = saved.role;
+    state.session = saved.token;
+    try {
+      if (saved.role === 'super') {
+        state.superData = await rpc('mc_super_state', { token: saved.token });
+        superView();
+        return;
+      }
+      if (saved.role === 'manager') {
+        await loadManager();
+        managerView();
+        return;
+      }
+      if (saved.role === 'school') {
+        state.schoolData = await rpc('mc_school_detail', { token: saved.token });
+        schoolView();
+        return;
+      }
+    } catch (e) {
+      clearSession();
+      state.role = ''; state.session = '';
+    }
+  }
+  loginView();
+}
+
+init();
+</script>
+</body>
+</html>
